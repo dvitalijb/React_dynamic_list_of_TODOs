@@ -1,4 +1,10 @@
 td {
     color: cadetblue;
     border-bottom: 1px solid lightcoral;
+    margin: 5px;
+    text-align: center;
+}
+
+table {
+    margin: 0 auto;
 }

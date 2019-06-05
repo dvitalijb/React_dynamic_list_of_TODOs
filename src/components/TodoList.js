@@ -3,11 +3,8 @@ import {Component} from 'react';
 import TodoItem from './TodoItem';
 
 class TodoList extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
-
-
-
 
         this.state = {
             requested: false,
@@ -19,6 +16,8 @@ class TodoList extends Component {
             filter: ''
         };
 
+        this.handleClick = this.handleClick.bind(this);
+        this.filterChanged = this.filterChanged.bind(this);
     }
 
     handleClick() {
@@ -26,17 +25,27 @@ class TodoList extends Component {
             requested: true
         });
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'http://my-json-server.typicode.com/mate-academy/literary-blog/articles');
+        const xhrTodos = new XMLHttpRequest();
+        const xhrUsers = new XMLHttpRequest();
 
-        xhr.addEventListener('load', () => {
+        xhrTodos.open('GET', 'https://jsonplaceholder.typicode.com/todos');
+        xhrUsers.open('GET', 'https://jsonplaceholder.typicode.com/users');
+
+        xhrTodos.addEventListener('load', () => {
             this.setState({
-                loaded: true,
-                articles: JSON.parse(xhr.response)
+                loadedTodos: true,
+                todos: JSON.parse(xhrTodos.response)
+            });
+        });
+        xhrUsers.addEventListener('load', () => {
+            this.setState({
+                loadedUsers: true,
+                users: JSON.parse(xhrUsers.response)
             });
         });
 
-        xhr.send();
+        xhrTodos.send();
+        xhrUsers.send();
     }
 
     filterChanged(event) {
@@ -45,59 +54,45 @@ class TodoList extends Component {
         );
     }
 
-
     render() {
-        if(!this.state.requested){
-            return <button onClick={this.handleClick}>Fetch articles!</button>;
-        } else if(this.state.loadedUsers&&this.state.loadedTodos){
-            const articleComponents = this.state.todos.filter(post => );
+        if (!this.state.requested) {
+
+            return <button onClick={this.handleClick}>Download posts!</button>;
+        } else if (this.state.loadedUsers && this.state.loadedTodos) {
+            const postComponents = this.state.todos.filter(post => {
+                return post.title.includes(this.state.filter)
+            });
 
             this.userMap = this.state.users.reduce((acc, user) => ({...acc, [user.id]: user,}), {});
-            this.items = this.state.todos.map(item => <TodoItem title={item.title}
-                                                                completed={item.completed}
-                                                                userId={item.userId}
-                                                                key={item.id}
-                                                                userMap={this.userMap}/>);
+            const items = postComponents.map(item => <TodoItem title={item.title}
+                                                               completed={item.completed}
+                                                               userId={item.userId}
+                                                               key={item.id}
+                                                               userMap={this.userMap}/>);
+
+            return (
+                <div>
+                    <input type="text" placeholder="search by title" onChange={this.filterChanged}/>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Completed</th>
+                            <th>User</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {items}
+                        </tbody>
+                    </table>
+                </div>
+            )
+        } else {
+            return (
+                <div>Loading...</div>
+            )
         }
-        return (
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Completed</th>
-                        <th>User</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {this.items}
-                    </tbody>
-                </table>
-        );
     }
 }
 
 export default TodoList;
-
-// export default function TodoList() {
-//     const userMap = users.reduce((acc, user) => ({...acc, [user.id]: user,}), {});
-//     const items = todos.map(item => <TodoItem title={item.title}
-//                                               completed={item.completed}
-//                                               userId={item.userId}
-//                                               key={item.id}
-//                                               userMap={userMap}/>);
-//
-//     return (
-//         <table>
-//             <thead>
-//             <tr>
-//                 <th>Title</th>
-//                 <th>Completed</th>
-//                 <th>User</th>
-//             </tr>
-//             </thead>
-//             <tbody>
-//             {items}
-//             </tbody>
-//         </table>
-//     )
-// }
