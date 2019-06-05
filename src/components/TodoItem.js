@@ -11,7 +11,7 @@ export default function TodoItem(props) {
                 <h5>{props.title}</h5>
             </td>
             <td>
-                <span>{props.completed ? 'Yes':'No'}</span>
+                <span>{props.completed ? 'Yes' : 'No'}</span>
             </td>
             <td>
                 <TodoUser name={user.name} username={user.username} email={user.email} phone={user.phone}/>
