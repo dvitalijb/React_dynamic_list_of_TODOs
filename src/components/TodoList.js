@@ -1,8 +1,7 @@
-import React from 'react';
-import { Component } from 'react';
-import TodoItem from './TodoItem';
+import React, { Component } from 'react';
+import { TodoItem } from './TodoItem';
 
-class TodoList extends Component {
+export class TodoList extends Component {
     constructor(props) {
         super(props);
 
@@ -27,9 +26,10 @@ class TodoList extends Component {
 
         const xhrTodos = new XMLHttpRequest();
         const xhrUsers = new XMLHttpRequest();
+        const url = 'https://jsonplaceholder.typicode.com/';
 
-        xhrTodos.open('GET', 'https://jsonplaceholder.typicode.com/todos');
-        xhrUsers.open('GET', 'https://jsonplaceholder.typicode.com/users');
+        xhrTodos.open('GET', `${url}todos`);
+        xhrUsers.open('GET', `${url}users`);
 
         xhrTodos.addEventListener('load', () => {
             this.setState({
@@ -60,30 +60,31 @@ class TodoList extends Component {
             return <button onClick={this.handleClick}>Download posts!</button>;
         } else if (this.state.loadedUsers && this.state.loadedTodos) {
             const postComponents = this.state.todos.filter(post => {
-                return post.title.includes(this.state.filter)
+                return post.title.includes(this.state.filter);
             });
 
             this.userMap = this.state.users.reduce((acc, user) => ({...acc, [user.id]: user,}), {});
-            const items = postComponents.map(item => <TodoItem title={item.title}
-                                                               completed={item.completed}
-                                                               userId={item.userId}
-                                                               key={item.id}
-                                                               userMap={this.userMap}/>);
+            const items = postComponents.map(item => (<TodoItem title={item.title}
+                                                                completed={item.completed}
+                                                                userId={item.userId}
+                                                                key={item.id}
+                                                                userMap={this.userMap}
+                                                                />));
 
             return (
                 <div>
                     <input type="text" placeholder="search by title" onChange={this.filterChanged}/>
                     <table>
                         <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Completed</th>
-                            <th>User</th>
-                        </tr>
+                            <tr>
+                                <th>Title</th>
+                                <th>Completed</th>
+                                <th>User</th>
+                            </tr>
                         </thead>
-                        <tbody>
-                        {items}
-                        </tbody>
+                            <tbody>
+                                {items}
+                            </tbody>
                     </table>
                 </div>
             )
@@ -94,5 +95,3 @@ class TodoList extends Component {
         }
     }
 }
-
-export default TodoList;
