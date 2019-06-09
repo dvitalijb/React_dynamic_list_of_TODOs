@@ -12,7 +12,7 @@ export class TodoList extends Component {
             articles: null,
             users: null,
             todos: null,
-            filter: ''
+            todoComponents: null
         };
 
         this.handleClick = this.handleClick.bind(this);
@@ -32,9 +32,11 @@ export class TodoList extends Component {
         xhrUsers.open('GET', `${url}users`);
 
         xhrTodos.addEventListener('load', () => {
+            const dataTodos = JSON.parse(xhrTodos.response);
             this.setState({
                 loadedTodos: true,
-                todos: JSON.parse(xhrTodos.response)
+                todos: dataTodos,
+                todoComponents: dataTodos
             });
         });
         xhrUsers.addEventListener('load', () => {
@@ -49,27 +51,28 @@ export class TodoList extends Component {
     }
 
     filterChanged(event) {
+        const filteredTodos = this.state.todos.filter(post => {
+            return post.title.includes(event.target.value);
+        });
         this.setState(
-            {filter: event.target.value}
+            {todoComponents: filteredTodos}
         );
     }
 
     render() {
         if (!this.state.requested) {
 
-            return <button onClick={this.handleClick}>Download posts!</button>;
+            return <input type="button" onClick={this.handleClick} value="Download todos!" />;
         } else if (this.state.loadedUsers && this.state.loadedTodos) {
-            const postComponents = this.state.todos.filter(post => {
-                return post.title.includes(this.state.filter);
-            });
-
             this.userMap = this.state.users.reduce((acc, user) => ({...acc, [user.id]: user,}), {});
-            const items = postComponents.map(item => (<TodoItem title={item.title}
-                                                                completed={item.completed}
-                                                                userId={item.userId}
-                                                                key={item.id}
-                                                                userMap={this.userMap}
-                                                                />));
+            const items = this.state.todoComponents.map(item => (
+              <TodoItem title={item.title}
+                completed={item.completed}
+                userId={item.userId}
+                key={item.id}
+                userMap={this.userMap}
+              />
+            ));
 
             return (
                 <div>
@@ -90,8 +93,8 @@ export class TodoList extends Component {
             )
         } else {
             return (
-                <div>Loading...</div>
-            )
+                <input type="button" disabled={true} value="Loading..."/>
+            );
         }
     }
 }
